@@ -1,20 +1,22 @@
+
 import sys
 import os
 import pytest
 import tempfile
 
-# Add the project root directory to Python path so 'backend' module can be found
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, project_root)
+# Add the project root directory to Python path so 'app' module can be found
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Now import from the backend modules
-from backend.main import app
-from backend.database import get_db
-from backend.models import Base
+from app.main import app
+from app.database import get_db
+from app.models import Base
 
 @pytest.fixture(scope="function")
 def test_engine():

@@ -1,3 +1,4 @@
+# This file has been moved to app/main.py
 import sys
 import os
 
@@ -10,10 +11,10 @@ from sqlalchemy.orm import Session
 from typing import List
 import uvicorn
 
-from backend.database import get_db, engine
-from backend.models import Base
-import backend.crud as crud
-import backend.schemas as schemas
+from app.database import get_db, engine
+from app.models import Base
+import app.crud as crud
+import app.schemas as schemas
 
 # Create tables
 Base.metadata.create_all(bind=engine)

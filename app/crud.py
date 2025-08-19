@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
-from backend.models import Member, Project
-from backend.schemas import MemberCreate, MemberUpdate, ProjectCreate, ProjectUpdate
+from app.models import Member, Project
+from app.schemas import MemberCreate, MemberUpdate, ProjectCreate, ProjectUpdate
 
 # Member CRUD
 def get_member(db: Session, member_id: int) -> Optional[Member]:

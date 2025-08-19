@@ -2,7 +2,7 @@ from pydantic import BaseModel, EmailStr, HttpUrl, ConfigDict
 from typing import List, Optional
 from datetime import datetime
 
-from backend.models import MemberRole, ProjectStatus
+from app.models import MemberRole, ProjectStatus
 
 # Member schemas
 class MemberBase(BaseModel):

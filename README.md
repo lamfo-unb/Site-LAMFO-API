@@ -1,33 +1,45 @@
-# FastAPI Template
 
-This sample repo contains the recommended structure for a Python FastAPI project. In this sample, we use `fastapi` to build a web application and the `pytest` to run tests.
+# LAMFO AI API Backend
 
-For a more in-depth tutorial, see our [Fast API tutorial](https://code.visualstudio.com/docs/python/tutorial-fastapi).
+This directory contains the backend API for the LAMFO website, built with FastAPI and SQLAlchemy. It provides endpoints and database models for managing LAMFO members, projects, and related data.
 
-The code in this repo aims to follow Python style guidelines as outlined in [PEP 8](https://peps.python.org/pep-0008/).
+## Purpose
 
-## Set up instructions
+This backend serves as the core API for the LAMFO group, supporting member and project management, and is designed for easy integration with both development (SQLite) and production (PostgreSQL) databases.
 
-This sample makes use of Dev Containers, in order to leverage this setup, make sure you have [Docker installed](https://www.docker.com/products/docker-desktop).
+## Structure
 
-To successfully run this example, we recommend the following VS Code extensions:
+- `app/` — Main application code (FastAPI app, models, schemas, CRUD, database setup)
+- `tests/` — Unit tests using pytest and SQLite for isolation
+- `requirements.txt` — Main dependencies
+- `requirements-test.txt` — Test dependencies
+- `docker-compose.yml` — (Optional) For running with Docker
+- `alembic.ini`, `pyproject.toml`, etc. — Configuration files
 
-- [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-- [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
-- [Python Debugger](https://marketplace.visualstudio.com/items?itemName=ms-python.debugpy)
-- [Pylance](https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance) 
+## Usage
 
-In addition to these extension there a few settings that are also useful to enable. You can enable to following settings by opening the Settings editor (`Ctrl+,`) and searching for the following settings:
+1. Install dependencies:
+	```sh
+	pip install -r requirements.txt
+	```
+2. Run the API (development):
+	```sh
+	uvicorn app.main:app --reload
+	```
+3. Run tests:
+	```sh
+	pytest
+	```
 
-- Python > Analysis > **Type Checking Mode** : `basic`
-- Python > Analysis > Inlay Hints: **Function Return Types** : `enable`
-- Python > Analysis > Inlay Hints: **Variable Types** : `enable`
+## Testing
 
-## Running the sample
-- Open the template folder in VS Code (**File** > **Open Folder...**)
-- Open the Command Palette in VS Code (**View > Command Palette...**) and run the **Dev Container: Reopen in Container** command.
-- Run the app using the Run and Debug view or by pressing `F5`
-- `Ctrl + click` on the URL that shows up on the terminal to open the running application 
-- Test the API functionality by navigating to `/docs` URL to view the Swagger UI
-- Configure your Python test in the Test Panel or by triggering the **Python: Configure Tests** command from the Command Palette
-- Run tests in the Test Panel or by clicking the Play Button next to the individual tests in the `test_main.py` file
+- All tests use a temporary SQLite database for isolation.
+- When integrating with PostgreSQL, add integration tests as needed.
+
+## Notes
+
+- The API docs are available at `/docs` when running the server.
+- See `app/populate_db.py` for mock data generation.
+
+---
+For questions or contributions, contact the LAMFO team.

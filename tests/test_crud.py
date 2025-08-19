@@ -1,8 +1,8 @@
 import pytest
 from sqlalchemy.orm import Session
-import backend.crud as crud
-import backend.schemas as schemas
-from backend.models import Member, Project
+import app.crud as crud
+import app.schemas as schemas
+from app.models import Member, Project
 
 class TestMemberCRUD:
     """Test member CRUD operations"""
