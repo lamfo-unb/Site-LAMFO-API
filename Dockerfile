@@ -1,4 +1,3 @@
-_forproxy_
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -12,6 +11,11 @@ COPY . .
 
 # Set environment variables
 ENV PYTHONPATH=/app
+ENV POSTGRES_USER=lamfo
+ENV POSTGRES_PASSWORD=TW6t68VwY8eS
+ENV POSTGRES_HOST=database.1.uyp0svq7o4zphkxe880tjqkjd
+ENV POSTGRES_PORT=5432
+ENV POSTGRES_DB=lamfo_db
 
 # Expose the port
 EXPOSE 8000

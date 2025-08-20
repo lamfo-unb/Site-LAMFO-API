@@ -4,19 +4,22 @@ import os
 import pytest
 import tempfile
 
+# Set the TEST_MODE environment variable before importing any app modules
+os.environ["TEST_MODE"] = "true"
+
 # Add the project root directory to Python path so 'app' module can be found
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
-# Now import from the backend modules
+# Now import from the app modules
 from app.main import app
 from app.database import get_db
-from app.models import Base
+from app.models import Base, Member, Project
 
 @pytest.fixture(scope="function")
 def test_engine():
@@ -31,7 +34,8 @@ def test_engine():
         connect_args={"check_same_thread": False}
     )
     
-    # Create all tables
+    # Drop all tables if they exist and recreate them
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     
     yield engine
@@ -39,7 +43,7 @@ def test_engine():
     # Cleanup
     try:
         os.unlink(test_db_path)
-    except:
+    except Exception:
         pass
 
 @pytest.fixture(scope="function")

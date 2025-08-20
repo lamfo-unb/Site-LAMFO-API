@@ -29,10 +29,10 @@ def create_member(db: Session, member: MemberCreate) -> Member:
     db.refresh(db_member)
     return db_member
 
-def update_member(db: Session, member_id: int, member_update: MemberUpdate) -> Optional[Member]:
+def update_member(db: Session, member_id: int, member: MemberUpdate) -> Optional[Member]:
     db_member = db.query(Member).filter(Member.id == member_id).first()
     if db_member:
-        update_data = member_update.model_dump(exclude_unset=True)
+        update_data = member.model_dump(exclude_unset=True)
         # Convert HttpUrl to string if present in update
         if 'linkedin_url' in update_data and update_data['linkedin_url']:
             update_data['linkedin_url'] = str(update_data['linkedin_url'])
@@ -81,10 +81,10 @@ def create_project(db: Session, project: ProjectCreate) -> Project:
     db.refresh(db_project)
     return db_project
 
-def update_project(db: Session, project_id: int, project_update: ProjectUpdate) -> Optional[Project]:
+def update_project(db: Session, project_id: int, project: ProjectUpdate) -> Optional[Project]:
     db_project = get_project(db, project_id)
     if db_project:
-        update_data = project_update.model_dump(exclude_unset=True)
+        update_data = project.model_dump(exclude_unset=True)
         member_ids = update_data.pop("member_ids", None)
         
         # Convert HttpUrl objects to strings if present in update

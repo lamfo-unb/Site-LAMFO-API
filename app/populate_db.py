@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from database import SessionLocal, engine
-from models import Base, Member, Project
+from .database import SessionLocal, engine
+from .models import Base, Member, Project
 import json
 
 def create_mock_data():
