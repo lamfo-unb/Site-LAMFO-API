@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     POSTGRES_USER: str = os.getenv("POSTGRES_USER", "lamfo")
     POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "")
     POSTGRES_HOST: str = os.getenv(
-        "POSTGRES_HOST", "database.1.uyp0svq7o4zphkxe880tjqkjd"
+        "POSTGRES_HOST", "database"
     )
     POSTGRES_PORT: str = os.getenv("POSTGRES_PORT", "5432")
     POSTGRES_DB: str = os.getenv("POSTGRES_DB", "lamfo_db")
