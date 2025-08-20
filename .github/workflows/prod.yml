@@ -49,4 +49,4 @@ jobs:
           password: ${{ secrets.DROPLET_PASSWORD }}
           script: |
             docker pull dauid64/site-lamfo:api-latest
-            docker service update lamfo-members-api --image dauid64/site-lamfo:api-latest --force
+            docker service update lamfo-api --image dauid64/site-lamfo:api-latest --force
