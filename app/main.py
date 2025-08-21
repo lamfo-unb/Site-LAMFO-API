@@ -1,4 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, Response
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from typing import List
 import uvicorn
@@ -16,12 +18,19 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="LAMFO API",
     description="API for managing LAMFO members and projects",
-    # Temporarily remove root_path to fix admin static files
-    # root_path="/api"
+    root_path="/api"  # This tells FastAPI it's mounted at /api
 )
 
 # Initialize SQLAdmin
 admin = create_admin(app)
+
+
+# Fix for SQLAdmin static files with root_path
+# Redirect /api/admin/statics/* to /admin/statics/*
+@app.api_route("/api/admin/statics/{file_path:path}", methods=["GET", "HEAD"])
+async def redirect_admin_statics(file_path: str):
+    """Redirect SQLAdmin static files to correct path"""
+    return RedirectResponse(url=f"/admin/statics/{file_path}", status_code=301)
 
 
 @app.get("/")
@@ -140,4 +149,4 @@ def create_project(
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8005)
