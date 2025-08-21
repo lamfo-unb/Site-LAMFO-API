@@ -16,7 +16,8 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="LAMFO API",
     description="API for managing LAMFO members and projects",
-    root_path="/api"  # This tells FastAPI it's mounted at /api
+    # Temporarily remove root_path to fix admin static files
+    # root_path="/api"
 )
 
 # Initialize SQLAdmin
