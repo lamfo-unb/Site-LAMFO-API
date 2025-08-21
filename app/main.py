@@ -24,37 +24,6 @@ app = FastAPI(
 # Initialize SQLAdmin
 admin = create_admin(app)
 
-
-# Fix for SQLAdmin static files with root_path
-# Mount SQLAdmin static files at the expected path for production
-@app.api_route("/api/admin/statics/{file_path:path}", methods=["GET", "HEAD"])
-async def serve_admin_statics(file_path: str, request: Request):
-    """Handle SQLAdmin static files by proxying to the internal path"""
-    import os
-    
-    # Try to serve the file directly from SQLAdmin's static directory
-    try:
-        # Get SQLAdmin's static directory
-        import sqladmin
-        sqladmin_path = os.path.dirname(sqladmin.__file__)
-        static_path = os.path.join(sqladmin_path, "statics", file_path)
-        
-        if os.path.exists(static_path):
-            return FileResponse(static_path)
-        else:
-            # Fallback to redirect
-            return RedirectResponse(
-                url=f"/admin/statics/{file_path}",
-                status_code=301
-            )
-    except Exception:
-        # Fallback to redirect if anything fails
-        return RedirectResponse(
-            url=f"/admin/statics/{file_path}",
-            status_code=301
-        )
-
-
 @app.get("/")
 def root():
     return {"message": "LAMFO API is running", "status": "operational"}
