@@ -6,6 +6,7 @@ import logging
 import os
 from . import models, schemas, crud
 from .database import get_db
+from .admin import create_admin
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -17,6 +18,9 @@ app = FastAPI(
     description="API for managing LAMFO members and projects",
     root_path="/api"  # This tells FastAPI it's mounted at /api
 )
+
+# Initialize SQLAdmin
+admin = create_admin(app)
 
 
 @app.get("/")
