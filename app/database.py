@@ -1,8 +1,13 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from pydantic_settings import BaseSettings
 import os
+import logging
 from app.models import Base
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class Settings(BaseSettings):
     # Test mode flag - when True, use SQLite instead of PostgreSQL
@@ -36,28 +41,99 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-# Create engine with appropriate settings based on database type
-if settings.TEST_MODE:
-    # SQLite for testing
-    engine = create_engine(
-        settings.database_url,
-        connect_args={"check_same_thread": False}
-    )
-else:
-    # PostgreSQL for production
-    engine = create_engine(
-        settings.database_url,
-        pool_pre_ping=True,  # Check connection before using it
-        pool_recycle=3600,   # Recycle connections after 1 hour
-    )
+# Database engine initialization
+engine = None
+SessionLocal = None
 
-# Create tables
-Base.metadata.create_all(bind=engine)
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+def create_database_engine():
+    """Create and return a database engine, with fallback logic"""
+    
+    if settings.TEST_MODE:
+        # SQLite for testing
+        logger.info("Using SQLite database for testing")
+        return create_engine(
+            settings.database_url,
+            connect_args={"check_same_thread": False}
+        )
+    
+    # Try PostgreSQL for production
+    logger.info("Attempting to connect to PostgreSQL...")
+    logger.info(f"Host: {settings.POSTGRES_HOST}")
+    logger.info(f"Port: {settings.POSTGRES_PORT}")
+    logger.info(f"Database: {settings.POSTGRES_DB}")
+    logger.info(f"User: {settings.POSTGRES_USER}")
+    db_url_masked = (
+        f"postgresql://{settings.POSTGRES_USER}:***@"
+        f"{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/"
+        f"{settings.POSTGRES_DB}"
+    )
+    logger.info(f"Database URL: {db_url_masked}")
+    
+    try:
+        pg_engine = create_engine(
+            settings.database_url,
+            pool_pre_ping=True,  # Check connection before using it
+            pool_recycle=3600,   # Recycle connections after 1 hour
+            pool_size=10,        # Connection pool size
+            max_overflow=20,     # Max connections beyond pool_size
+            connect_args={"connect_timeout": 30}  # 30 seconds timeout
+        )
+        # Test the connection with a quick query
+        logger.info("Testing database connection...")
+        with pg_engine.connect() as connection:
+            result = connection.execute(text("SELECT 1"))
+            logger.info(f"Connection test result: {result.fetchone()}")
+        logger.info("✅ Successfully connected to PostgreSQL!")
+        return pg_engine
+    except Exception as e:
+        logger.error(f"❌ Failed to connect to PostgreSQL: {e}")
+        logger.error(f"Exception type: {type(e).__name__}")
+        
+        # In production, we require PostgreSQL
+        env = os.getenv("ENVIRONMENT", "production").lower()
+        if env == "production":
+            logger.critical("PostgreSQL connection required for production.")
+            raise
+        
+        # For development, fall back to SQLite
+        logger.warning("Falling back to SQLite database for development")
+        return create_engine(
+            settings.SQLITE_URL,
+            connect_args={"check_same_thread": False}
+        )
+
+
+def get_engine():
+    """Get the database engine, creating it if necessary"""
+    global engine
+    if engine is None:
+        engine = create_database_engine()
+        # Create tables when engine is first created
+        try:
+            Base.metadata.create_all(bind=engine)
+            logger.info("Database tables created successfully")
+        except Exception as e:
+            logger.error(f"Error creating database tables: {e}")
+            logger.warning("Application may have limited functionality")
+    return engine
+
+
+def get_session_local():
+    """Get the SessionLocal class, creating it if necessary"""
+    global SessionLocal
+    if SessionLocal is None:
+        SessionLocal = sessionmaker(
+            autocommit=False,
+            autoflush=False,
+            bind=get_engine()
+        )
+    return SessionLocal
 
 
 def get_db():
+    """Get a database session"""
+    SessionLocal = get_session_local()
     db = SessionLocal()
     try:
         yield db

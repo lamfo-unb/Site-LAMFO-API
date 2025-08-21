@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from .database import SessionLocal, engine
+from .database import get_session_local, get_engine
 from .models import Base, Member, Project
 import json
 
@@ -7,8 +7,10 @@ def create_mock_data():
     """Create mock data for testing"""
     
     # Create tables
+    engine = get_engine()
     Base.metadata.create_all(bind=engine)
     
+    SessionLocal = get_session_local()
     db = SessionLocal()
     
     try:

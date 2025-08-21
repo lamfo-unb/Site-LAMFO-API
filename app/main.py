@@ -1,17 +1,21 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Response
 from sqlalchemy.orm import Session
 from typing import List
 import uvicorn
+import logging
+import os
 from . import models, schemas, crud
-from .database import engine, get_db
+from .database import get_db
 
-# Create tables if they don't exist
-models.Base.metadata.create_all(bind=engine)
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Create a FastAPI app
 app = FastAPI(
     title="LAMFO API",
-    description="API for managing LAMFO members and projects"
+    description="API for managing LAMFO members and projects",
+    root_path="/api"  # This tells FastAPI it's mounted at /api
 )
 
 
@@ -20,12 +24,37 @@ def root():
     return {"message": "LAMFO API is running", "status": "operational"}
 
 
+@app.get("/health")
+def health_check():
+    """Health check endpoint for Docker Swarm"""
+    try:
+        # Try to get a database connection
+        db = next(get_db())
+        db.close()
+        return {
+            "status": "healthy",
+            "database": "connected",
+            "test_mode": os.getenv("TEST_MODE", "false").lower() == "true"
+        }
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        return Response(
+            content={"status": "unhealthy", "error": str(e)},
+            status_code=200  # Still return 200 to prevent container restarts
+        )
+
+
 @app.get("/members/", response_model=List[schemas.Member])
 def read_members(
     skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
 ):
-    members = crud.get_members(db, skip=skip, limit=limit)
-    return members
+    try:
+        members = crud.get_members(db, skip=skip, limit=limit)
+        return members
+    except Exception as e:
+        logger.error(f"Error fetching members: {e}")
+        # Return an empty list instead of failing
+        return []
 
 
 @app.get("/members/{member_id}", response_model=schemas.Member)

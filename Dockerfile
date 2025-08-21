@@ -2,20 +2,27 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Install system dependencies including PostgreSQL client
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY pyproject.toml .
+RUN pip install --no-cache-dir -e .
 
 # Copy application code
 COPY . .
 
 # Set environment variables
 ENV PYTHONPATH=/app
-ENV POSTGRES_USER=lamfo
-ENV POSTGRES_PASSWORD=TW6t68VwY8eS
-ENV POSTGRES_HOST=database
-ENV POSTGRES_PORT=5432
-ENV POSTGRES_DB=lamfo_db
+# SQLite fallback for development
+ENV SQLITE_URL=sqlite:///./test.db
+# Ensure we're not in test mode by default
+ENV TEST_MODE=false
+
+# Create empty SQLite database
+RUN touch /app/test.db
 
 # Expose the port
 EXPOSE 8000

@@ -11,25 +11,29 @@ This backend serves as the core API for the LAMFO group, supporting member and p
 
 - `app/` — Main application code (FastAPI app, models, schemas, CRUD, database setup)
 - `tests/` — Unit tests using pytest and SQLite for isolation
-- `requirements.txt` — Main dependencies
-- `requirements-test.txt` — Test dependencies
+- `pyproject.toml` — Project configuration and dependencies
 - `docker-compose.yml` — For running with Docker and PostgreSQL
-- `alembic.ini`, `pyproject.toml`, etc. — Configuration files
+- `alembic.ini`, etc. — Configuration files
 
 ## Usage
 
 1. Install dependencies:
-	```sh
-	pip install -r requirements.txt
-	```
+
+    ```sh
+    pip install -e .
+    ```
+
 2. Run the API (development):
-	```sh
-	uvicorn app.main:app --reload
-	```
+
+    ```sh
+    uvicorn app.main:app --reload
+    ```
+
 3. Run tests:
-	```sh
-	pytest
-	```
+
+    ```sh
+    pytest
+    ```
 
 ## Testing
 
@@ -78,17 +82,41 @@ docker-compose logs -f
 docker-compose down
 ```
 
+## Environment Setup
+
+Before running the application, you need to set up environment variables:
+
+1. Copy the example environment file:
+
+   ```sh
+   cp .env.example .env
+   ```
+
+2. Edit the `.env` file and fill in the actual values for your environment.
+
+## Environment Variables
+
+The application uses the following environment variables:
+
+### General Settings
+
+- `ENVIRONMENT`: Application environment (default: "production") - Options: production, development, staging
+- `TEST_MODE`: Set to "true" for SQLite, "false" for PostgreSQL (default: "false")
+
+### Database Settings
+
+- `SQLITE_URL`: SQLite database URL (default: "sqlite:///./test.db") - Used when TEST_MODE=true
+- `POSTGRES_USER`: PostgreSQL user (default: "lamfo")
+- `POSTGRES_PASSWORD`: PostgreSQL password (**required** - no default for security)
+- `POSTGRES_HOST`: PostgreSQL host (default: "database")
+- `POSTGRES_PORT`: PostgreSQL port (default: "5432")
+- `POSTGRES_DB`: PostgreSQL database name (default: "lamfo_db")
+
+**Important**: When `TEST_MODE=false`, all PostgreSQL environment variables must be properly set.
+
 ## Connecting to PostgreSQL
 
-The API is configured to connect to a PostgreSQL database using the following environment variables:
-
-- `POSTGRES_USER`: Database user (default: "lamfo")
-- `POSTGRES_PASSWORD`: Database password
-- `POSTGRES_HOST`: Database host (default: "database.1.uyp0svq7o4zphkxe880tjqkjd")
-- `POSTGRES_PORT`: Database port (default: "5432")
-- `POSTGRES_DB`: Database name (default: "lamfo_db")
-
-These can be set in the `.env` file or passed as environment variables.
+These variables can be set in the `.env` file or passed as environment variables.
 
 To check database connectivity, run:
 

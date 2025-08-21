@@ -1,8 +1,23 @@
-from pydantic import BaseModel, EmailStr, HttpUrl, ConfigDict
+from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
 from datetime import datetime
+import logging
 
 from app.models import MemberRole, ProjectStatus
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Try to import EmailStr and HttpUrl, fall back to str if not available
+try:
+    from pydantic import EmailStr, HttpUrl
+    logger.info("Successfully imported EmailStr and HttpUrl from pydantic")
+except ImportError:
+    logger.warning("email-validator not installed, using str types instead of EmailStr")
+    # Create fallback types that are just aliases for str
+    EmailStr = str
+    HttpUrl = str
 
 # Member schemas
 class MemberBase(BaseModel):
