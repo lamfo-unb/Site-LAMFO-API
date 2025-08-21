@@ -1,6 +1,6 @@
-from fastapi import FastAPI, HTTPException, Depends, Response
+from fastapi import FastAPI, HTTPException, Depends, Response, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, FileResponse
 from sqlalchemy.orm import Session
 from typing import List
 import uvicorn
@@ -26,11 +26,33 @@ admin = create_admin(app)
 
 
 # Fix for SQLAdmin static files with root_path
-# Redirect /api/admin/statics/* to /admin/statics/*
+# Mount SQLAdmin static files at the expected path for production
 @app.api_route("/api/admin/statics/{file_path:path}", methods=["GET", "HEAD"])
-async def redirect_admin_statics(file_path: str):
-    """Redirect SQLAdmin static files to correct path"""
-    return RedirectResponse(url=f"/admin/statics/{file_path}", status_code=301)
+async def serve_admin_statics(file_path: str, request: Request):
+    """Handle SQLAdmin static files by proxying to the internal path"""
+    import os
+    
+    # Try to serve the file directly from SQLAdmin's static directory
+    try:
+        # Get SQLAdmin's static directory
+        import sqladmin
+        sqladmin_path = os.path.dirname(sqladmin.__file__)
+        static_path = os.path.join(sqladmin_path, "statics", file_path)
+        
+        if os.path.exists(static_path):
+            return FileResponse(static_path)
+        else:
+            # Fallback to redirect
+            return RedirectResponse(
+                url=f"/admin/statics/{file_path}",
+                status_code=301
+            )
+    except Exception:
+        # Fallback to redirect if anything fails
+        return RedirectResponse(
+            url=f"/admin/statics/{file_path}",
+            status_code=301
+        )
 
 
 @app.get("/")
