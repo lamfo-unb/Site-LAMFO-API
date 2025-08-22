@@ -52,6 +52,7 @@ coverage.xml
 .vscode/
 *.swp
 *.swo
+**/__pycache__/
 
 # Docker
 .dockerignore

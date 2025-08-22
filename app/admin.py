@@ -20,6 +20,11 @@ class MemberAdmin(ModelView, model=Member):
     column_list = [
         Member.id, Member.name, Member.email, Member.role, Member.created_at
     ]
+    column_details_list = [
+        Member.id, Member.name, Member.email, Member.role, Member.bio,
+        Member.github_username, Member.linkedin_url, Member.projects,
+        Member.created_at, Member.updated_at
+    ]
     column_searchable_list = [Member.name, Member.email]
     column_sortable_list = [
         Member.id, Member.name, Member.email, Member.created_at
@@ -39,6 +44,11 @@ class ProjectAdmin(ModelView, model=Project):
     """Admin interface for Project model"""
     column_list = [
         Project.id, Project.title, Project.status, Project.created_at
+    ]
+    column_details_list = [
+        Project.id, Project.title, Project.description, Project.status,
+        Project.github_url, Project.demo_url, Project.members,
+        Project.created_at, Project.updated_at
     ]
     column_searchable_list = [Project.title, Project.description]
     column_sortable_list = [Project.id, Project.title, Project.created_at]

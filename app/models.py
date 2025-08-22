@@ -48,6 +48,14 @@ class Member(Base):
     
     # Relationships
     projects = relationship("Project", secondary=member_project_association, back_populates="members")
+    
+    def __str__(self):
+        return f"{self.name} ({self.role or 'No role'})"
+    
+    def __repr__(self):
+        return (f"<Member(id={self.id}, name='{self.name}', "
+                f"email='{self.email}')>")
+
 
 class Project(Base):
     __tablename__ = "projects"
@@ -62,4 +70,15 @@ class Project(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Relationships
-    members = relationship("Member", secondary=member_project_association, back_populates="projects")
+    members = relationship(
+        "Member",
+        secondary=member_project_association,
+        back_populates="projects"
+    )
+    
+    def __str__(self):
+        return f"{self.title} ({self.status})"
+    
+    def __repr__(self):
+        return (f"<Project(id={self.id}, title='{self.title}', "
+                f"status='{self.status}')>")

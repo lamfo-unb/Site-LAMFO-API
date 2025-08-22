@@ -58,4 +58,5 @@ jobs:
               --env-add POSTGRES_DB=lamfo_db \
               --env-add ENVIRONMENT=production \
               --env-add TEST_MODE=false \
+              --env-add ROOT_PATH=/api \
               --force

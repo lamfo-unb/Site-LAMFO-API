@@ -15,14 +15,17 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Create a FastAPI app
+# Use root_path for production, but allow override via environment variable
+root_path = os.getenv("ROOT_PATH", "")
 app = FastAPI(
     title="LAMFO API",
     description="API for managing LAMFO members and projects",
-    root_path="/api"  # This tells FastAPI it's mounted at /api
+    root_path=root_path
 )
 
 # Initialize SQLAdmin
 admin = create_admin(app)
+
 
 @app.get("/")
 def root():
