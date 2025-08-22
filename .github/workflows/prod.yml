@@ -49,4 +49,13 @@ jobs:
           password: ${{ secrets.DROPLET_PASSWORD }}
           script: |
             docker pull dauid64/site-lamfo:api-latest
-            docker service update lamfo-api --image dauid64/site-lamfo:api-latest --force
+            docker service update lamfo-api \
+              --image dauid64/site-lamfo:api-latest \
+              --env-add POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+              --env-add POSTGRES_USER=lamfo \
+              --env-add POSTGRES_HOST=database \
+              --env-add POSTGRES_PORT=5432 \
+              --env-add POSTGRES_DB=lamfo_db \
+              --env-add ENVIRONMENT=production \
+              --env-add TEST_MODE=false \
+              --force

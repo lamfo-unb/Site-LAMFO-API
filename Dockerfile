@@ -14,10 +14,6 @@ RUN pip install --no-cache-dir -e .
 # Copy application code
 COPY . .
 
-# Copy .env file if it exists (for development/testing)
-# Note: In production, environment variables should be set via Docker service/compose
-COPY .env* ./
-
 # Set default environment variables
 ENV PYTHONPATH=/app
 # SQLite fallback for development
@@ -26,9 +22,6 @@ ENV SQLITE_URL=sqlite:///./test.db
 ENV TEST_MODE=false
 # Set production environment
 ENV ENVIRONMENT=production
-
-# Create empty SQLite database for fallback
-RUN touch /app/test.db
 
 # Expose the port
 EXPOSE 8000
