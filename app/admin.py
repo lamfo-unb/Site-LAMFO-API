@@ -1,7 +1,6 @@
 from sqladmin import Admin, ModelView
 from .database import get_engine
 from .models import Member, Project
-import os
 
 
 def create_admin(app):
