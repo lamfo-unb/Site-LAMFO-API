@@ -79,12 +79,24 @@ def create_database_engine():
             max_overflow=20,     # Max connections beyond pool_size
             connect_args={"connect_timeout": 30}  # 30 seconds timeout
         )
-        # Test the connection with a quick query
-        logger.info("Testing database connection...")
-        with pg_engine.connect() as connection:
-            result = connection.execute(text("SELECT 1"))
-            logger.info(f"Connection test result: {result.fetchone()}")
-        logger.info("✅ Successfully connected to PostgreSQL!")
+        # Only test connection in non-production or when explicitly requested
+        env = os.getenv("ENVIRONMENT", "production").lower()
+        test_connection = (
+            os.getenv("TEST_DB_CONNECTION", "false").lower() == "true"
+        )
+        
+        if env != "production" or test_connection:
+            logger.info("Testing database connection...")
+            with pg_engine.connect() as connection:
+                result = connection.execute(text("SELECT 1"))
+                logger.info(f"Connection test result: {result.fetchone()}")
+            logger.info("✅ Successfully connected to PostgreSQL!")
+        else:
+            logger.info(
+                "⚡ PostgreSQL engine created "
+                "(connection will be tested on first use)"
+            )
+        
         return pg_engine
     except Exception as e:
         logger.error(f"❌ Failed to connect to PostgreSQL: {e}")

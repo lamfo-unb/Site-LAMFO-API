@@ -1,32 +1,13 @@
 from sqladmin import Admin, ModelView
-from .database import engine
+from .database import get_engine
 from .models import Member, Project
 import os
 
 
 def create_admin(app):
     """Create and configure SQLAdmin for the FastAPI app"""
-    # Detect if we're in a proxied environment
-    # In production, the static files will be served by the proxy/web server
-    is_proxied = os.getenv("PROXIED_DEPLOYMENT", "false").lower() == "true"
-    
-    if is_proxied:
-        # In proxied deployment, configure admin to work with reverse proxy
-        admin = Admin(
-            app,
-            engine,
-            title="LAMFO Admin",
-            # The proxy will handle serving static files at /api/admin/statics/
-        )
-    else:
-        # For local development
-        admin = Admin(app, engine, title="LAMFO Admin")
-    
-    # Add model views
-    admin.add_view(MemberAdmin)
-    admin.add_view(ProjectAdmin)
-    
-    return admin
+
+    admin = Admin(app, get_engine(), title="LAMFO Admin")
     
     # Add model views
     admin.add_view(MemberAdmin)
